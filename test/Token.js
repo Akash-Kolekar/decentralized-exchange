@@ -6,12 +6,15 @@ const tokens = (n) => {
 };
 
 describe("Token", () => {
-  let token;
+  let token, accounts, deployer;
 
   beforeEach(async () => {
     // Fetch Token from blockchain
     const Token = await ethers.getContractFactory("Token");
     token = await Token.deploy("Almighty", "ALM", "1000000");
+
+    accounts = await ethers.getSigners();
+    deployer = accounts[0];
   });
 
   describe("Deployment", () => {
@@ -32,8 +35,12 @@ describe("Token", () => {
       expect(await token.decimals()).to.equal(decimals);
     });
 
-    it("has correct totalSupply", async function () {
+    it("has correct totalSupply", async () => {
       expect(await token.totalSupply()).to.equal(totalSupply);
+    });
+
+    it("asigns totalSupply to deployer", async () => {
+      expect(await token.balanceOf(deployer.address)).to.equal(totalSupply);
     });
   });
 });
