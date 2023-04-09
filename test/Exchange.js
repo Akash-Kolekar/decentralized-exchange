@@ -19,6 +19,7 @@ describe("Token", () => {
     const Token = await ethers.getContractFactory("Token");
 
     token1 = await Token.deploy("Almighty", "ALM", "1000000");
+    token2 = await Token.deploy("Mock Dai", "mDAI", "1000000");
 
     let transaction = await token1
       .connect(deployer)
@@ -163,6 +164,58 @@ describe("Token", () => {
       expect(await exchange.balanceOf(token1.address, user1.address)).to.equal(
         amount
       );
+    });
+  });
+
+  describe("Making orders", () => {
+    let transaction, result;
+    amount = tokens(10);
+
+    describe("Success", () => {
+      beforeEach(async () => {
+        // Approve token
+        transaction = await token1
+          .connect(user1)
+          .approve(exchange.address, amount);
+        result = await transaction.wait();
+        // Deposit token
+        transaction = await exchange
+          .connect(user1)
+          .depositToken(token1.address, amount);
+        result = await transaction.wait();
+        // Make orders
+        transaction = await exchange
+          .connect(user1)
+          .makeOrder(token2.address, tokens(1), token1.address, tokens(1));
+        result = await transaction.wait();
+      });
+
+      it("tracks the newly created orders", async () => {
+        expect(await exchange.ordersCount()).to.equal(1);
+      });
+      it("emits a Order event", async () => {
+        const event = result.events[0];
+        expect(event.event).to.equal("Order");
+        const args = event.args;
+
+        expect(args.id).to.equal(1);
+        expect(args.user).to.equal(user1.address);
+        expect(args.tokenGet).to.equal(token2.address);
+        expect(args.amountGet).to.equal(tokens(1));
+        expect(args.tokenGive).to.equal(token1.address);
+        expect(args.amountGive).to.equal(tokens(1));
+        expect(args.timeStamp).to.at.least(1);
+      });
+    });
+
+    describe("Failure", () => {
+      it("rejects with no balance", async () => {
+        await expect(
+          exchange
+            .connect(user1)
+            .makeOrder(token2.address, tokens(1), token1.address, tokens(1))
+        ).to.be.reverted;
+      });
     });
   });
 });
