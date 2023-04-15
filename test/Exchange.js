@@ -1,26 +1,27 @@
-const { ethers } = require("hardhat");
 const { expect } = require("chai");
+const { ethers } = require("hardhat");
 
 const tokens = (n) => {
   return ethers.utils.parseUnits(n.toString(), "ether");
 };
 
 describe("Exchange", () => {
-  let accounts, deployer, feeAccount, user1, exchange, token1, token2, user2;
+  let deployer, feeAccount, exchange;
+
   const feePercent = 10;
 
   beforeEach(async () => {
+    const Exchange = await ethers.getContractFactory("Exchange");
+    const Token = await ethers.getContractFactory("Token");
+
+    token1 = await Token.deploy("Dapp University", "DAPP", "1000000");
+    token2 = await Token.deploy("Mock Dai", "mDAI", "1000000");
+
     accounts = await ethers.getSigners();
     deployer = accounts[0];
     feeAccount = accounts[1];
     user1 = accounts[2];
     user2 = accounts[3];
-
-    const Exchange = await ethers.getContractFactory("Exchange");
-    const Token = await ethers.getContractFactory("Token");
-
-    token1 = await Token.deploy("Almighty", "ALM", "1000000");
-    token2 = await Token.deploy("Mock Dai", "mDAI", "1000000");
 
     let transaction = await token1
       .connect(deployer)
@@ -31,11 +32,11 @@ describe("Exchange", () => {
   });
 
   describe("Deployment", () => {
-    it("tracks the fee account", async function () {
+    it("tracks the fee account", async () => {
       expect(await exchange.feeAccount()).to.equal(feeAccount.address);
     });
 
-    it("tracks the fee percent", async function () {
+    it("tracks the fee percent", async () => {
       expect(await exchange.feePercent()).to.equal(feePercent);
     });
   });
@@ -46,13 +47,12 @@ describe("Exchange", () => {
 
     describe("Success", () => {
       beforeEach(async () => {
-        // Approve tokens
+        // Approve Token
         transaction = await token1
           .connect(user1)
           .approve(exchange.address, amount);
         result = await transaction.wait();
-
-        // Deposit tokens
+        // Deposit token
         transaction = await exchange
           .connect(user1)
           .depositToken(token1.address, amount);
@@ -99,19 +99,18 @@ describe("Exchange", () => {
       beforeEach(async () => {
         // Deposit tokens before withdrawing
 
-        // Approve tokens
+        // Approve Token
         transaction = await token1
           .connect(user1)
           .approve(exchange.address, amount);
         result = await transaction.wait();
-
-        // Deposit tokens
+        // Deposit token
         transaction = await exchange
           .connect(user1)
           .depositToken(token1.address, amount);
         result = await transaction.wait();
 
-        // Withdraw tokens
+        // Now withdraw Tokens
         transaction = await exchange
           .connect(user1)
           .withdrawToken(token1.address, amount);
@@ -155,12 +154,11 @@ describe("Exchange", () => {
     let amount = tokens(1);
 
     beforeEach(async () => {
-      // Approve token
+      // Approve Token
       transaction = await token1
         .connect(user1)
         .approve(exchange.address, amount);
       result = await transaction.wait();
-
       // Deposit token
       transaction = await exchange
         .connect(user1)
@@ -175,15 +173,16 @@ describe("Exchange", () => {
     });
   });
 
-  describe("Making orders", () => {
+  describe("Making orders", async () => {
     let transaction, result;
+
     let amount = tokens(1);
 
-    describe("Success", () => {
+    describe("Success", async () => {
       beforeEach(async () => {
         // Deposit tokens before making order
 
-        // Approve token
+        // Approve Token
         transaction = await token1
           .connect(user1)
           .approve(exchange.address, amount);
@@ -201,8 +200,8 @@ describe("Exchange", () => {
         result = await transaction.wait();
       });
 
-      it("tracks the newly created orders", async () => {
-        expect(await exchange.ordersCount()).to.equal(1);
+      it("tracks the newly created order", async () => {
+        expect(await exchange.orderCount()).to.equal(1);
       });
 
       it("emits an Order event", async () => {
@@ -220,8 +219,8 @@ describe("Exchange", () => {
       });
     });
 
-    describe("Failure", () => {
-      it("rejects with no balance", async () => {
+    describe("Failure", async () => {
+      it("Rejects with no balance", async () => {
         await expect(
           exchange
             .connect(user1)
@@ -231,17 +230,17 @@ describe("Exchange", () => {
     });
   });
 
-  describe("Order actions", () => {
+  describe("Order actions", async () => {
     let transaction, result;
     let amount = tokens(1);
 
     beforeEach(async () => {
-      // Approve token by user1
+      // user1 deposits tokens
       transaction = await token1
         .connect(user1)
         .approve(exchange.address, amount);
       result = await transaction.wait();
-      // Deposit token by user1 to exchange
+
       transaction = await exchange
         .connect(user1)
         .depositToken(token1.address, amount);
@@ -253,26 +252,26 @@ describe("Exchange", () => {
         .transfer(user2.address, tokens(100));
       result = await transaction.wait();
 
-      // Approve token by user2
+      // user2 deposits tokens
       transaction = await token2
         .connect(user2)
         .approve(exchange.address, tokens(2));
       result = await transaction.wait();
-      // Deposit token by user2 to exchange
+
       transaction = await exchange
         .connect(user2)
         .depositToken(token2.address, tokens(2));
       result = await transaction.wait();
 
-      // Make orders
+      // Make an order
       transaction = await exchange
         .connect(user1)
         .makeOrder(token2.address, amount, token1.address, amount);
       result = await transaction.wait();
     });
 
-    describe("Cancelling orders", () => {
-      describe("Success", () => {
+    describe("Cancelling orders", async () => {
+      describe("Success", async () => {
         beforeEach(async () => {
           transaction = await exchange.connect(user1).cancelOrder(1);
           result = await transaction.wait();
@@ -297,19 +296,18 @@ describe("Exchange", () => {
         });
       });
 
-      describe("Failure", () => {
+      describe("Failure", async () => {
         beforeEach(async () => {
-          // Approve token
+          // user1 deposits tokens
           transaction = await token1
             .connect(user1)
             .approve(exchange.address, amount);
           result = await transaction.wait();
-          // Deposit token
           transaction = await exchange
             .connect(user1)
             .depositToken(token1.address, amount);
           result = await transaction.wait();
-          // Make orders
+          // Make an order
           transaction = await exchange
             .connect(user1)
             .makeOrder(token2.address, amount, token1.address, amount);
@@ -328,36 +326,32 @@ describe("Exchange", () => {
       });
     });
 
-    describe("Filling orders", () => {
+    describe("Filling orders", async () => {
       describe("Success", () => {
         beforeEach(async () => {
+          // user2 fills order
           transaction = await exchange.connect(user2).fillOrder("1");
           result = await transaction.wait();
         });
 
         it("executes the trade and charge fees", async () => {
-          // Token give
+          // Token Give
           expect(
             await exchange.balanceOf(token1.address, user1.address)
           ).to.equal(tokens(0));
-
           expect(
             await exchange.balanceOf(token1.address, user2.address)
           ).to.equal(tokens(1));
-
           expect(
             await exchange.balanceOf(token1.address, feeAccount.address)
           ).to.equal(tokens(0));
-
           // Token get
           expect(
             await exchange.balanceOf(token2.address, user1.address)
           ).to.equal(tokens(1));
-
           expect(
             await exchange.balanceOf(token2.address, user2.address)
           ).to.equal(tokens(0.9));
-
           expect(
             await exchange.balanceOf(token2.address, feeAccount.address)
           ).to.equal(tokens(0.1));
@@ -397,7 +391,7 @@ describe("Exchange", () => {
           await expect(exchange.connect(user2).fillOrder(1)).to.be.reverted;
         });
 
-        it("rejects canceled orders", async () => {
+        it("Rejects canceled orders", async () => {
           transaction = await exchange.connect(user1).cancelOrder(1);
           await transaction.wait();
 
