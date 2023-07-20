@@ -18,11 +18,11 @@ async function main() {
   console.log("Using chainId:", chainId);
 
   // Fetch deployed tokens
-  const DApp = await ethers.getContractAt(
+  const SkyGod = await ethers.getContractAt(
     "Token",
-    config[chainId].DApp.address
+    config[chainId].SkyGod.address
   );
-  console.log(`Dapp Token fetched: ${DApp.address}\n`);
+  console.log(`SKYGOD Token fetched: ${SkyGod.address}\n`);
 
   const mETH = await ethers.getContractAt(
     "Token",
@@ -60,15 +60,15 @@ async function main() {
   const user2 = accounts[1];
   amount = tokens(10000);
 
-  // user1 approves 10,000 Dapp...
-  transaction = await DApp.connect(user1).approve(exchange.address, amount);
+  // user1 approves 10,000 SkyGod...
+  transaction = await SkyGod.connect(user1).approve(exchange.address, amount);
   await transaction.wait();
   console.log(`Approved ${amount} tokens from ${user1.address}`);
 
-  // user1 deposits 10,000 DApp...
+  // user1 deposits 10,000 SkyGod...
   transaction = await exchange
     .connect(user1)
-    .depositToken(DApp.address, amount);
+    .depositToken(SkyGod.address, amount);
   await transaction.wait();
   console.log(`Deposited ${amount} Ether from ${user1.address}\n`);
 
@@ -92,7 +92,7 @@ async function main() {
   let orderId;
   transaction = await exchange
     .connect(user1)
-    .makeOrder(mETH.address, tokens(100), DApp.address, tokens(5));
+    .makeOrder(mETH.address, tokens(100), SkyGod.address, tokens(5));
   result = await transaction.wait();
   console.log(`Made order from ${user1.address}`);
 
@@ -112,7 +112,7 @@ async function main() {
   // User 1 makes order
   transaction = await exchange
     .connect(user1)
-    .makeOrder(mETH.address, tokens(100), DApp.address, tokens(10));
+    .makeOrder(mETH.address, tokens(100), SkyGod.address, tokens(10));
   result = await transaction.wait();
   console.log(`Made order from ${user1.address}`);
 
@@ -129,7 +129,7 @@ async function main() {
   transaction = await exchange.makeOrder(
     mETH.address,
     tokens(50),
-    DApp.address,
+    SkyGod.address,
     tokens(15)
   );
   result = await transaction.wait();
@@ -147,7 +147,7 @@ async function main() {
   // User 1 makes final order
   transaction = await exchange
     .connect(user1)
-    .makeOrder(mETH.address, tokens(200), DApp.address, tokens(20));
+    .makeOrder(mETH.address, tokens(200), SkyGod.address, tokens(20));
   result = await transaction.wait();
   console.log(`Made order from ${user1.address}`);
 
@@ -168,7 +168,7 @@ async function main() {
   for (let i = 1; i <= 10; i++) {
     transaction = await exchange
       .connect(user1)
-      .makeOrder(mETH.address, tokens(10 * i), DApp.address, tokens(10));
+      .makeOrder(mETH.address, tokens(10 * i), SkyGod.address, tokens(10));
     result = await transaction.wait();
 
     console.log(`Made order from ${user1.address}`);
@@ -181,7 +181,7 @@ async function main() {
   for (let i = 1; i <= 10; i++) {
     transaction = await exchange
       .connect(user2)
-      .makeOrder(DApp.address, tokens(10), mETH.address, tokens(10 * i));
+      .makeOrder(SkyGod.address, tokens(10), mETH.address, tokens(10 * i));
     result = await transaction.wait();
 
     console.log(`Made order from ${user2.address}`);

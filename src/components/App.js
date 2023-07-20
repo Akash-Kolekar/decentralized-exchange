@@ -43,9 +43,9 @@ function App() {
     });
 
     // Load token smart contracts
-    const DApp = config[chainId].DApp;
+    const SkyGod = config[chainId].SkyGod;
     const mETH = config[chainId].mETH;
-    await loadTokens(provider, [DApp.address, mETH.address], dispatch);
+    await loadTokens(provider, [SkyGod.address, mETH.address], dispatch);
 
     // Load exchange smart contract
     const exchangeConfig = config[chainId].exchange;

@@ -30,8 +30,8 @@ const Navbar = () => {
   return (
     <div className="exchange__header grid">
       <div className="exchange__header--brand flex">
-        <img src={logo} className="logo" alt="DApp Logo"></img>
-        <h1>DApp Token Exchange</h1>
+        <img src={logo} className="logo" alt="SkyGod Logo"></img>
+        <h1>SkyGod Token Exchange</h1>
       </div>
 
       <div className="exchange__header--networks flex">
@@ -49,6 +49,7 @@ const Navbar = () => {
             </option>
             <option value="0x7A69">Localhost</option>
             <option value="0x5">Goerli</option>
+            <option value="0xaa36a7">Sepolia</option>
           </select>
         )}
       </div>

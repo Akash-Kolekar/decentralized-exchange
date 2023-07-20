@@ -125,7 +125,7 @@ const Balance = () => {
         </div>
       </div>
 
-      {/* Deposit/Withdraw Component 1 (DApp) */}
+      {/* Deposit/Withdraw Component 1 (SkyGod) */}
 
       <div className="exchange__transfers--form">
         <div className="flex-between">

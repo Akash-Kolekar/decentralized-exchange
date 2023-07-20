@@ -3,7 +3,7 @@
     "exchange": {
       "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
     },
-    "DApp": {
+    "SkyGod": {
       "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
     },
     "mETH": {
@@ -14,7 +14,34 @@
     },
     "explorerURL": "#"
   },
+  "11155111": {
+    "exchange": {
+      "address": "0x8F8a00EA6e1B86B928b4fB04393CCCf9adA525eC"
+    },
+    "SkyGod": {
+      "address": "0xDFa09bcd6f06CF8e180b9DC417766498EC0Fb609"
+    },
+    "mETH": {
+      "address": "0x73f8359D5dAEc253Be0923b6Fe337283792f3892"
+    },
+    "mDAI": {
+      "address": "0x36Cb418B953177627CA84b30C7caDF4EccceB695"
+    },
+    "explorerURL": "https://sepolia.etherscan.io/"
+  },
   "5": {
+    "exchange": {
+      "address": "0x8a8D8DE17c1E1Ec9CcF9d818b22ee1cDE45f9174"
+    },
+    "SkyGod": {
+      "address": "0xec613A78472b5290490A20E749a2539246B0DeF6"
+    },
+    "mETH": {
+      "address": "0x3f0AC7A2A8f59DF2241C1Cd4d3D67A6578431AE8"
+    },
+    "mDAI": {
+      "address": "0x69C21DaF9C71CCc57F0B5386cb2a92B6152568CD"
+    },
     "explorerURL": "https://goerli.etherscan.io/"
   }
 }
